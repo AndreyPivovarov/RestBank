@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-indexes
+      author: AndreyPivovarov
+      changes:
+        - createIndex:
+            tableName: cards
+            indexName: idx_cards_user_id
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            tableName: cards
+            indexName: idx_cards_status
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            tableName: transfers
+            indexName: idx_transfers_from_card_id
+            columns:
+              - column:
+                  name: from_card_id
+
+        - createIndex:
+            tableName: transfers
+            indexName: idx_transfers_to_card_id
+            columns:
+              - column:
+                  name: to_card_id
+
+        - createIndex:
+            tableName: block_requests
+            indexName: idx_block_requests_card_id
+            columns:
+              - column:
+                  name: card_id
+
+        - createIndex:
+            tableName: block_requests
+            indexName: idx_block_requests_status
+            columns:
+              - column:
+                  name: status

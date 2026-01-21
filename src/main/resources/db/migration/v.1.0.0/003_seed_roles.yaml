@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-roles
+      author: AndreyPivovarov
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
+                  name: name
+                  value: "ROLE_ADMIN"
+              - column:
+                  name: description
+                  value: "Administrator with full access"
+              - column:
+                  name: created_at
+                  valueComputed: now()
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
+                  name: name
+                  value: "ROLE_USER"
+              - column:
+                  name: description
+                  value: "Regular user"
+              - column:
+                  name: created_at
+                  valueComputed: now()
