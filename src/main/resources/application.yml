@@ -34,3 +34,5 @@ spring:
 app:
   security:
     encryption-key: ${APP_SECURITY_ENCRYPTION_KEY}
+    jwt-secret: ${APP_SECURITY_JWT_SECRET}
+    jwt-ttl-minutes: 60

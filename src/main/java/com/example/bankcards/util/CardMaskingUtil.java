@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class CardMaskingUtil {
+public final class CardMaskingUtil {
 
     public String extractLast4(String pan) {
         if (pan == null || pan.length() < 4) {

@@ -5,10 +5,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
-import com.example.bankcards.util.CardEncryptionUtil;
-import com.example.bankcards.util.CardMaskingUtil;
-import com.example.bankcards.util.CardNumberGenerator;
-import com.example.bankcards.util.ValidationUtil;
+import com.example.bankcards.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,7 +33,7 @@ public class CardService {
     private static final String STATUS_BLOCKED = "BLOCKED";
 
     @Transactional
-    public Card createCard(UUID userId, String ownerName) {
+    public Card createCard(UUID userId, String username, String ownerName) {
         log.info("Creating new card for user ID: {}", userId);
 
         if (userId == null) {
@@ -45,6 +42,11 @@ public class CardService {
         if (ownerName == null || ownerName.trim().isEmpty()) {
             throw new IllegalArgumentException("Owner name cannot be empty");
         }
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("User name cannot be empty");
+        }
+
+        requireAdmin(username);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -108,7 +110,7 @@ public class CardService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        if (!user.getUsername().equals(username) && !isAdmin(username)) {
+        if (!user.getUsername().equals(username) && !SecurityUtil.isAdmin()) {
             throw new AccessDeniedException("You can only view your own cards");
         }
 
@@ -129,10 +131,10 @@ public class CardService {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
 
+        requireAdmin(username);
+
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
-
-        validateCardAccess(card, username);
 
         if (STATUS_BLOCKED.equals(card.getStatus())) {
             throw new IllegalStateException("Card is already blocked");
@@ -155,10 +157,10 @@ public class CardService {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
 
+        requireAdmin(username);
+
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
-
-        validateCardAccess(card, username);
 
         if (STATUS_ACTIVE.equals(card.getStatus())) {
             throw new IllegalStateException("Card is already active");
@@ -185,10 +187,10 @@ public class CardService {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
 
+        requireAdmin(username);
+
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
-
-        validateCardAccess(card, username);
 
         if (card.getBalance().compareTo(BigDecimal.ZERO) > 0) {
             throw new IllegalStateException("Cannot delete card with non-zero balance");
@@ -198,19 +200,11 @@ public class CardService {
         log.info("Card deleted successfully: {}", cardId);
     }
 
-    @Transactional
-    public Card updateBalance(UUID cardId, BigDecimal amount) {
-        log.debug("Updating balance for card ID: {}", cardId);
+    private Card updateBalance(Card card, BigDecimal amount) {
 
-        if (cardId == null) {
-            throw new IllegalArgumentException("Card ID cannot be null");
-        }
         if (amount == null) {
             throw new IllegalArgumentException("Amount cannot be null");
         }
-
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
 
         if (!STATUS_ACTIVE.equals(card.getStatus())) {
             throw new IllegalStateException("Cannot update balance for non-active card");
@@ -244,9 +238,8 @@ public class CardService {
         }
 
         Card card = getCardById(cardId, username);
-        validateCardAccess(card, username);
 
-        return updateBalance(cardId, amount);
+        return updateBalance(card, amount);
     }
 
     @Transactional(readOnly = true)
@@ -255,23 +248,18 @@ public class CardService {
         return cardMaskingUtil.maskPan(card.getPanLast4());
     }
 
-    @Transactional(readOnly = true)
-    public String getDecryptedCardNumber(UUID cardId, String username) {
-        log.warn("Decrypting full PAN for card {}", cardId);
-
-        Card card = getCardById(cardId, username);
-        return cardEncryptionUtil.decryptPan(card.getPanEncrypted());
-    }
-
     private void validateCardAccess(Card card, String username) {
-        if (!card.getUser().getUsername().equals(username) && !isAdmin(username)) {
+        if (SecurityUtil.isAdmin()) {
+            return;
+        }
+        if (!card.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("You don't have permission to access this card");
         }
     }
 
-    private boolean isAdmin(String username) {
-        return userRepository.findByUsername(username)
-                .map(user -> "ROLE_ADMIN".equals(user.getRole().getName()))
-                .orElse(false);
+    private void requireAdmin(String username) {
+        if (!SecurityUtil.isAdmin()) {
+            throw new AccessDeniedException("Admin privileges required");
+        }
     }
 }

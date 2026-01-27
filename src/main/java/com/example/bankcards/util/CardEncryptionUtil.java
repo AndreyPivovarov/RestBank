@@ -12,7 +12,7 @@ import java.util.Base64;
 
 @Component
 @Slf4j
-public class CardEncryptionUtil {
+public final class CardEncryptionUtil {
 
     @Value("${app:security:encryption-key}")
     private String encryptionKey;

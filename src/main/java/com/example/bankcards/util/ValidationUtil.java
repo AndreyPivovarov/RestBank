@@ -8,7 +8,7 @@ import java.time.YearMonth;
 
 @Component
 @Slf4j
-public class ValidationUtil {
+public final class ValidationUtil {
 
     public boolean isCardExpired(Integer expMonth, Integer expYear) {
         if (expMonth == null || expYear == null) {

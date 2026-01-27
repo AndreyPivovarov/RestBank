@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CardNumberGenerator {
+public final class CardNumberGenerator {
 
     private final CardRepository cardRepository;
     private final CardEncryptionUtil cardEncryptionUtil;
