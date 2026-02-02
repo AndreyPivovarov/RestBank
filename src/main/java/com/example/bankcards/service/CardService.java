@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +33,9 @@ public class CardService {
     private static final String STATUS_ACTIVE = "ACTIVE";
     private static final String STATUS_BLOCKED = "BLOCKED";
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public Card createCard(UUID userId, String username, String ownerName) {
+    public Card createCard(UUID userId, String ownerName) {
         log.info("Creating new card for user ID: {}", userId);
 
         if (userId == null) {
@@ -42,11 +44,6 @@ public class CardService {
         if (ownerName == null || ownerName.trim().isEmpty()) {
             throw new IllegalArgumentException("Owner name cannot be empty");
         }
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("User name cannot be empty");
-        }
-
-        requireAdmin(username);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -124,14 +121,13 @@ public class CardService {
     }
 
     @Transactional
-    public Card blockCard(UUID cardId, String username) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public Card blockCard(UUID cardId) {
         log.info("Blocking card with ID: {}", cardId);
 
         if (cardId == null) {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
-
-        requireAdmin(username);
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
@@ -150,14 +146,13 @@ public class CardService {
     }
 
     @Transactional
-    public Card unblockCard(UUID cardId, String username) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public Card unblockCard(UUID cardId) {
         log.info("Unblocking card with ID: {}", cardId);
 
         if (cardId == null) {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
-
-        requireAdmin(username);
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
@@ -180,14 +175,13 @@ public class CardService {
     }
 
     @Transactional
-    public void deleteCard(UUID cardId, String username) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCard(UUID cardId) {
         log.info("Deleting card with ID: {}", cardId);
 
         if (cardId == null) {
             throw new IllegalArgumentException("Card ID cannot be null");
         }
-
-        requireAdmin(username);
 
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + cardId));
@@ -254,12 +248,6 @@ public class CardService {
         }
         if (!card.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("You don't have permission to access this card");
-        }
-    }
-
-    private void requireAdmin(String username) {
-        if (!SecurityUtil.isAdmin()) {
-            throw new AccessDeniedException("Admin privileges required");
         }
     }
 }
