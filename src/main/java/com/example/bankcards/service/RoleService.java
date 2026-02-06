@@ -23,12 +23,4 @@ public class RoleService {
                     return new RuntimeException("Role not found: " + name);
                 });
     }
-
-    public Role getRoleById(UUID id) {
-        return roleRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Role not found with ID: {}", id);
-                    return new RuntimeException("Role not found with ID: " + id);
-                });
-    }
 }
