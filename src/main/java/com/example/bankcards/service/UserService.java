@@ -2,10 +2,12 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +48,7 @@ public class UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("User not found: {}", username);
-                    return new RuntimeException("User not found: " + username);
+                    return new ResourceNotFoundException("User not found: " + username);
                 });
     }
 
@@ -54,10 +56,11 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("User not found with ID: {}", id);
-                    return new RuntimeException("User not found with ID: " + id);
+                    return new ResourceNotFoundException("User not found with ID: " + id);
                 });
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void disableUser(UUID userId) {
         User user = findById(userId);
@@ -66,6 +69,7 @@ public class UserService {
         log.info("Disabled user: {}", user.getUsername());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void enableUser(UUID userId) {
         User user = findById(userId);

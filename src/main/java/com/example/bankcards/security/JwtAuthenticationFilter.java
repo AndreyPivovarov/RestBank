@@ -6,22 +6,22 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
+@Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -40,16 +40,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String username = claims.getSubject();
 
-            @SuppressWarnings("unchecked")
-            List<String> roles = claims.get("roles", List.class); // ["ROLE_ADMIN", "ROLE_USER"]
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            var authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            var auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                if (!userDetails.isEnabled()) {
+                    SecurityContextHolder.clearContext();
+                    chain.doFilter(request, response);
+                    return;
+                }
 
+                var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         } catch (Exception e) {
             SecurityContextHolder.clearContext(); // токен битый/просрочен
         }
