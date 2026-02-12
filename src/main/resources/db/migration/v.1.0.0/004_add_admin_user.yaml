@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-seed-admin-user
+      author: AndreyPivovarov
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password_hash
+                  value: "$2a$10$pf71VoUsGfi275Bj3X18KOvSL16GIt5Hqf98kazNx4.rsvtucSt8u"
+              - column:
+                  name: role_id
+                  valueComputed: "(SELECT id FROM roles WHERE name = 'ROLE_ADMIN')"
+              - column:
+                  name: enabled
+                  valueBoolean: true
+              - column:
+                  name: created_at
+                  valueComputed: "NOW()"

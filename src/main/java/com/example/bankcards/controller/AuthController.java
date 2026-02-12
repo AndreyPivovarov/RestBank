@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> register(@RequestBody @Valid AuthRequestDto request) {
 
-        User user = userService.createUser(request.username(), request.password(), "USER");
+        User user = userService.createUser(request.username(), request.password(), "ROLE_USER");
 
         UserResponseDto body = new UserResponseDto(
                 user.getId(),
@@ -38,7 +38,7 @@ public class AuthController {
         );
 
         return ResponseEntity
-                .created(URI.create("/users" + user.getId()))
+                .created(URI.create("/users " + user.getId()))
                 .body(body);
     }
 

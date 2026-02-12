@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/migration/v.1.0.0/002_indexes.yaml
   - include:
       file: db/migration/v.1.0.0/003_seed_roles.yaml
+  - include:
+      file: db/migration/v.1.0.0/004_add_admin_user.yaml

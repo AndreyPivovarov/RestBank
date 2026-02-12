@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 true,
                 true,
                 true,
-                List.of(new SimpleGrantedAuthority("ROLE_" + roleName))
+                List.of(new SimpleGrantedAuthority(roleName))
         );
 
     }

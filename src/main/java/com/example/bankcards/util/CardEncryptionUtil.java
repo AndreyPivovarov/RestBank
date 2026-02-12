@@ -14,7 +14,7 @@ import java.util.Base64;
 @Slf4j
 public final class CardEncryptionUtil {
 
-    @Value("${app:security:encryption-key}")
+    @Value("${app.security.encryption-key}")
     private String encryptionKey;
 
     public String encryptPan(String pan) {
