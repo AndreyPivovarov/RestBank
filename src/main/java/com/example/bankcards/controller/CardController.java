@@ -3,6 +3,9 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.CreateCardRequest;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.service.CardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,14 +17,19 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 @RequestMapping("/cards")
+@Tag(name = "Cards", description = "Управление банковскими картами")
 public class CardController {
 
     private final CardService cardService;
 
-    // USER или ADMIN (ADMIN сможет смотреть любые через SecurityUtil.isAdmin в сервисе)
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Получить карту по ID",
+            description = "Возвращает информацию о карте. USER может видеть только свои карты, ADMIN - любые."
+    )
     public Card getById(@PathVariable UUID id, Principal principal) {
         return cardService.getCardById(id, principal.getName());
     }

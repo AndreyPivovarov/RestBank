@@ -36,3 +36,15 @@ app:
     encryption-key: ${APP_SECURITY_ENCRYPTION_KEY}
     jwt-secret: ${APP_SECURITY_JWT_SECRET}
     jwt-ttl-minutes: 60
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs                    # Путь к JSON спецификации OpenAPI
+    enabled: true                          # Включить генерацию документации
+  swagger-ui:
+    path: /swagger-ui.html                 # Путь к Swagger UI
+    enabled: true                          # Включить Swagger UI
+    operationsSorter: method               # Сортировка операций по HTTP методу
+    tagsSorter: alpha                      # Сортировка тегов по алфавиту
+    tryItOutEnabled: true                  # Включить кнопку "Try it out"

@@ -5,6 +5,7 @@ import com.example.bankcards.dto.BlockRequestDecisionDto;
 import com.example.bankcards.dto.BlockRequestResponseDto;
 import com.example.bankcards.entity.BlockRequest;
 import com.example.bankcards.service.BlockRequestService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 @RequestMapping("/block-requests")
 public class BlockRequestController {
