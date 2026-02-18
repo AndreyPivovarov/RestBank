@@ -27,41 +27,56 @@ public class CardController {
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Получить карту по ID",
+            summary = "Получить карту по ID карты",
             description = "Возвращает информацию о карте. USER может видеть только свои карты, ADMIN - любые."
     )
     public Card getById(@PathVariable UUID id, Principal principal) {
         return cardService.getCardById(id, principal.getName());
     }
 
-    // USER: только свои, ADMIN: любые (проверка в сервисе)
     @GetMapping
+    @Operation(
+            summary = "Получить список карт пользователя",
+            description = "Возвращает постраничный список карт. USER видит только свои карты, ADMIN может указать любого пользователя."
+    )
     public Page<Card> getUserCards(@RequestParam("userId") UUID userId,
                                    Pageable pageable,
                                    Principal principal) {
         return cardService.getUserCards(userId, principal.getName(), pageable);
     }
 
-    // ADMIN-only (CardService уже помечен @PreAuthorize)
     @PostMapping
+    @Operation(
+            summary = "Создать новую карту (только ADMIN)",
+            description = "Создает новую банковскую карту для указанного пользователя. Номер карты генерируется автоматически и шифруется."
+    )
     public Card create(@RequestBody @Valid CreateCardRequest req) {
         return cardService.createCard(req.userId(), req.ownerName());
     }
 
-    // ADMIN-only
     @PostMapping("/{id}/block")
+    @Operation(
+            summary = "Заблокировать карту (только ADMIN)",
+            description = "Меняет статус карты на BLOCKED. Заблокированной картой нельзя пользоваться."
+    )
     public Card block(@PathVariable UUID id) {
         return cardService.blockCard(id);
     }
 
-    // ADMIN-only
     @PostMapping("/{id}/unblock")
+    @Operation(
+            summary = "Разблокировать карту (только ADMIN)",
+            description = "Меняет статус карты на ACTIVE. Разблокировать можно только действующую (не истекшую) карту."
+    )
     public Card unblock(@PathVariable UUID id) {
         return cardService.unblockCard(id);
     }
 
-    // ADMIN-only
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Удалить карту (только ADMIN)",
+            description = "Удаляет карту из системы. Можно удалить только карту с нулевым балансом."
+    )
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         cardService.deleteCard(id);
         return ResponseEntity.noContent().build();

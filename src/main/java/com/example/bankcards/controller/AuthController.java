@@ -6,6 +6,8 @@ import com.example.bankcards.dto.UserResponseDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.security.JwtService;
 import com.example.bankcards.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Аутентификация и регистрация пользователей")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,6 +30,10 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @Operation(
+            summary = "Регистрация нового пользователя",
+            description = "Создает нового пользователя с ролью USER. Username должен быть уникальным."
+    )
     public ResponseEntity<UserResponseDto> register(@RequestBody @Valid AuthRequestDto request) {
 
         User user = userService.createUser(request.username(), request.password(), "ROLE_USER");
@@ -43,6 +50,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(
+            summary = "Вход в систему",
+            description = "Аутентификация пользователя. Возвращает JWT токен для доступа к защищенным эндпоинтам."
+    )
     public AuthResponseDto login(@RequestBody @Valid AuthRequestDto request) {
 
         Authentication auth = authenticationManager.authenticate(
