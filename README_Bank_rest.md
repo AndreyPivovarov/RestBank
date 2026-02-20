@@ -11,8 +11,12 @@ DB_USER=bank_user
 DB_PASSWORD=bank_password
 DB_HOST=localhost
 DB_PORT=5432
-APP_SECURITY_ENCRYPTION_KEY= AES,32
-APP_SECURITY_JWT_SECRET="K7x2qL5wR8nF4ABC0cY9m-PDE9zFGH=vH6dJ3gS1bT"
+APP_SECURITY_ENCRYPTION_KEY= "ваш_секретный_ключ"
+APP_SECURITY_JWT_SECRET="ваш_секретный_ключ"
+
+Требования к ключу:
+- Минимум 32 символа
+- Можно использовать любые буквы (A-Z, a-z), цифры (0-9) и спецсимволы
 
 2. Поднять базу данных:
 
