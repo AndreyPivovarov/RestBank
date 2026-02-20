@@ -45,7 +45,7 @@ public class AuthController {
         );
 
         return ResponseEntity
-                .created(URI.create("/users " + user.getId()))
+                .created(URI.create("/users" + user.getId()))
                 .body(body);
     }
 
