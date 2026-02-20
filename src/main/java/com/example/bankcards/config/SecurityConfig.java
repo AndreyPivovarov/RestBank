@@ -40,11 +40,11 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/swagger-ui/**",        // Основной UI
-                                "/swagger-ui.html",      // HTML страница
-                                "/v3/api-docs/**",       // OpenAPI JSON
-                                "/swagger-resources/**", // Ресурсы (на всякий случай)
-                                "/webjars/**"            // WebJars библиотеки
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/auth/**").permitAll()
 

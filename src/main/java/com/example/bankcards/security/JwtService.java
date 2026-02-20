@@ -33,7 +33,7 @@ public class JwtService {
 
         return Jwts.builder()
                 .subject(username)
-                .claim("roles", roles) // например ["ROLE_ADMIN"]
+                .claim("roles", roles)
                 .issuedAt(now)
                 .expiration(exp)
                 .signWith(key)

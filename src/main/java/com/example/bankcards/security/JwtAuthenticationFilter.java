@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            SecurityContextHolder.clearContext(); // токен битый/просрочен
+            SecurityContextHolder.clearContext();
         }
 
         chain.doFilter(request, response);

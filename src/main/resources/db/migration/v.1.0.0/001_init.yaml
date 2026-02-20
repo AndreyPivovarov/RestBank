@@ -109,19 +109,16 @@ databaseChangeLog:
                   type: varchar(200)
                   constraints:
                     nullable: false
-              # Шифртекст номера карты (например Base64 от AES-шифрования)
               - column:
                   name: pan_encrypted
                   type: text
                   constraints:
                     nullable: false
-              # Для маски **** **** **** 1234
               - column:
                   name: pan_last4
                   type: varchar(4)
                   constraints:
                     nullable: false
-              # Чтобы можно было делать UNIQUE (по “отпечатку” номера), не раскрывая PAN
               - column:
                   name: pan_hash
                   type: varchar(64)
